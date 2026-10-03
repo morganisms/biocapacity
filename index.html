@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BioCapacity</title>
+<meta name="description" content="Plan team capacity across a biotech / diagnostics project portfolio.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗓️</text></svg>">
+<style id="app-style">
+/* Palette and type follow BioPortfolio (morganisms.github.io/bioportfolio) */
+:root{
+  --navy:#17304b;--teal:#2a8c82;--teal-lt:#7fd1c4;
+  --bg:#f2f6f7;--surface:#ffffff;--ink:#1c2b3a;--muted:#5d6b78;--line:#e1e7ec;--head:#eef2f5;--head-ink:#3b4a58;
+  --btn-hover:#b9c5cf;--callout:#e9f3f1;--callout-ink:#2d4a47;--danger:#9a3b3b;--warn:#8a6a12;--focus:#2a8c82;
+  --h0:transparent;--h0i:#9aa5af;
+  --h1:#e6e9f2;--h1i:#3b4a7a;
+  --h2:#e3f4ea;--h2i:#1f7a52;
+  --h3:#fbf1d6;--h3i:#8a6a12;
+  --h4:#9a3b3b;--h4i:#ffffff;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#10233a;--bg:#111a23;--surface:#18232e;--ink:#e3e9ee;--muted:#9aa8b5;--line:#2a3743;--head:#1f2c38;--head-ink:#b5c2ce;
+    --btn-hover:#3c4c5b;--callout:#16302d;--callout-ink:#bfe3dc;--danger:#e58a8a;--warn:#e8c77a;--focus:#7fd1c4;
+    --h0i:#5d6b78;--h1:#242d45;--h1i:#b4bfe6;--h2:#173a2a;--h2i:#9fdcb9;--h3:#3e3315;--h3i:#f0d68f;--h4:#b14848;--h4i:#ffffff;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#10233a;--bg:#111a23;--surface:#18232e;--ink:#e3e9ee;--muted:#9aa8b5;--line:#2a3743;--head:#1f2c38;--head-ink:#b5c2ce;
+  --btn-hover:#3c4c5b;--callout:#16302d;--callout-ink:#bfe3dc;--danger:#e58a8a;--warn:#e8c77a;--focus:#7fd1c4;
+  --h0i:#5d6b78;--h1:#242d45;--h1i:#b4bfe6;--h2:#173a2a;--h2i:#9fdcb9;--h3:#3e3315;--h3i:#f0d68f;--h4:#b14848;--h4i:#ffffff;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;min-height:100%}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Header */
+header.apphead{background:var(--navy);color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-size:26px;font-weight:700}
+.brand span{color:var(--teal-lt)}
+.tagline{font-size:15px;opacity:.85;margin-top:2px}
+.tag{font-size:18px;color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4)}
+.tag:hover{color:var(--teal-lt);border-bottom-color:var(--teal-lt)}
+.tag:focus-visible{outline-color:var(--teal-lt)}
+.headtools{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.themetoggle{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 14px 7px 11px;font-size:14px;font-weight:600;cursor:pointer}
+.themetoggle:hover{border-color:var(--teal-lt);color:var(--teal-lt)}
+.themetoggle:focus-visible{outline-color:var(--teal-lt)}
+.themetoggle svg{width:16px;height:16px;flex:none}
+
+
+/* Layout and type */
+.wrap{max-width:1700px;margin:0 auto;padding:36px 24px 60px}
+h1{font-size:34px;line-height:1.15;margin:0 0 8px}
+.lead{color:var(--muted);font-size:18px;margin:0 0 22px;max-width:75ch}
+.btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:24px}
+.status{color:var(--muted);font-size:14px;margin-right:2px}
+.status.warn{color:var(--warn);font-weight:600}
+
+/* Buttons and fields */
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 16px;border-radius:7px;font-weight:600;font-size:15px;line-height:1.2;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--btn-hover)}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.primary:hover{filter:brightness(1.15)}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.quiet:hover{color:var(--ink)}
+.btn[disabled]{opacity:.45;cursor:default}
+select,input[type=text],input[type=number]{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;padding:9px 11px;font-size:15px}
+
+/* Summary callout */
+.summary{background:var(--callout);border-left:4px solid var(--teal);border-radius:6px;padding:14px 18px;margin-bottom:22px;color:var(--callout-ink);max-width:90ch}
+.summary p{margin:0}
+.summary p+p{margin-top:4px;opacity:.85}
+.samplebanner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:18px;color:var(--muted)}
+
+/* Toolbar */
+.toolbar{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nav .btn{padding:8px 13px;font-size:14px}
+.check{display:flex;gap:8px;align-items:center;font-weight:600;font-size:15px;cursor:pointer;margin-left:6px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--line)}
+
+/* Grid */
+.gridwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px}
+table.grid{border-collapse:separate;border-spacing:0;width:100%;min-width:max-content}
+.grid th,.grid td{padding:0;border-bottom:1px solid var(--line)}
+.grid thead th{background:var(--head);color:var(--head-ink);font-weight:600;font-size:13px;text-transform:uppercase;padding:12px 6px;text-align:center;min-width:66px;border-bottom:0;white-space:nowrap}
+.grid thead th:first-child{border-radius:8px 0 0 8px}
+.grid thead th:last-child{border-radius:0 8px 8px 0}
+.grid thead th.now{color:var(--teal)}
+.grid thead th.now::after{content:"";display:block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin:4px auto 0}
+.grid .namecol{position:sticky;left:0;z-index:1;background:var(--surface);text-align:left;min-width:240px;max-width:270px;border-right:1px solid var(--line)}
+.grid thead .namecol{z-index:2;padding-left:14px;background:var(--head);text-align:left}
+.person{display:flex;width:100%;align-items:center;gap:10px;padding:12px 12px 12px 14px;background:none;border:0;cursor:pointer;text-align:left}
+.person:hover .pname{color:var(--teal)}
+.chev{width:10px;flex:none;color:var(--muted);transition:transform .15s}
+.open .chev{transform:rotate(90deg)}
+.pname{font-weight:600;display:block}
+.prole{display:block;font-size:13px;color:var(--muted);font-weight:400}
+td.cell{text-align:center;font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;height:54px;border-left:2px solid var(--surface)}
+td.cell.h0{background:var(--h0);color:var(--h0i);font-weight:400}
+td.cell.h1{background:var(--h1);color:var(--h1i)}
+td.cell.h2{background:var(--h2);color:var(--h2i)}
+td.cell.h3{background:var(--h3);color:var(--h3i)}
+td.cell.h4{background:var(--h4);color:var(--h4i)}
+td.cell.nowcol{box-shadow:inset 0 0 0 2px var(--teal)}
+tr.sub td{background:var(--bg)}
+tr.sub .namecol{background:var(--bg);padding:6px 8px 6px 36px;font-size:14px}
+.projlabel{display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.projlabel .txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;border-radius:5px;padding:3px 7px;font-size:17px;line-height:1}
+.x:hover{color:var(--danger);background:var(--head)}
+.x.armed,.btn.armed{background:var(--danger);color:#fff;border-color:var(--danger);font-size:13px;font-weight:700;padding:5px 9px}
+tr.sub td.in{padding:4px 3px}
+input.alloc{width:100%;min-width:56px;border:1px solid transparent;background:transparent;border-radius:6px;text-align:center;padding:7px 2px;font-size:15px;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+input.alloc::-webkit-outer-spin-button,input.alloc::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input.alloc:hover{border-color:var(--line);background:var(--surface)}
+input.alloc:focus{border-color:var(--teal);background:var(--surface);outline:none}
+tr.addrow .namecol{padding:8px 8px 10px 36px}
+.addproj{display:flex;gap:6px}
+.addproj select{flex:1;min-width:0;padding:7px 9px;font-size:14px}
+.addproj .btn{padding:7px 12px;font-size:14px}
+.rowhint{color:var(--muted);font-size:13px;padding-left:10px}
+tr.team td,tr.team th{border-bottom:0}
+tr.team .namecol{padding:14px;font-weight:700;font-size:13px;text-transform:uppercase;color:var(--head-ink)}
+tr.team td.cell{font-size:14px;height:46px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+
+/* Panels */
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:26px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px}
+.panel h2{font-size:22px;margin:0 0 6px}
+.panel .hint{margin:0 0 14px;color:var(--muted);font-size:14px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;min-width:0}
+.form select,.form input{width:100%;min-width:0;max-width:100%;text-overflow:ellipsis;font-weight:400}
+.form .actions{grid-column:1/-1;display:flex;gap:8px;align-items:center}
+.list{list-style:none;margin:0 0 14px;padding:0}
+.list li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.list input[type=text]{flex:1;min-width:0}
+.list input.cap{width:72px}
+.list .role{flex:1;min-width:0}
+.list input[type=color]{width:30px;height:30px;padding:0;border:1px solid var(--line);border-radius:7px;background:none;cursor:pointer}
+.addline{display:flex;gap:8px;flex-wrap:wrap}
+.addline input{flex:1;min-width:120px}
+.note{font-size:14px;color:var(--muted);margin-top:8px}
+
+/* Import */
+.importpanel{margin-bottom:22px;border-left:4px solid var(--teal);max-width:860px}
+.importpanel h2:focus{outline:none}
+.importpanel .actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+.modes{border:0;padding:0;margin:12px 0;display:grid;gap:8px}
+.modes label{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.modes label:has(input:checked){border-color:var(--teal);background:var(--callout)}
+.modes input{margin-top:4px;accent-color:var(--teal)}
+.impstats{margin:12px 0 0;font-weight:600}
+.imperror{margin:12px 0 4px;color:var(--danger)}
+.implist{margin:4px 0 0;padding-left:20px;font-size:14px;color:var(--muted)}
+.implist.warn{color:var(--warn)}
+
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:8px;font-size:15px;max-width:calc(100% - 32px);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.show{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+@media (max-width:900px){
+  .wrap{padding:24px 16px 48px}
+  h1{font-size:28px}
+  .lead{font-size:16px}
+}
+@media (max-width:640px){
+  .grid .namecol{min-width:160px;max-width:170px}
+  .prole{display:none}
+  .form{grid-template-columns:1fr}
+  .tag{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="root"><p class="empty">Loading capacity plan…</p></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="application/json" id="sample">{"people": [{"id": "p1", "name": "Priya Raman", "role": "Program manager", "capacity": 100}, {"id": "p2", "name": "Daniel Okafor", "role": "Assay development scientist", "capacity": 100}, {"id": "p3", "name": "Lena Hoffmann", "role": "Systems engineer", "capacity": 100}, {"id": "p4", "name": "Marcus Chen", "role": "Quality engineer", "capacity": 100}, {"id": "p5", "name": "Sofia Alvarez", "role": "Regulatory affairs", "capacity": 80}, {"id": "p6", "name": "Tomás Reyes", "role": "Manufacturing engineer", "capacity": 100}], "projects": [{"id": "j1", "name": "Assay v2 verification", "color": "#3B6FD8"}, {"id": "j2", "name": "Instrument transfer to manufacturing", "color": "#2E9C8A"}, {"id": "j3", "name": "510(k) submission prep", "color": "#C2621B"}, {"id": "j4", "name": "Reagent supplier qualification", "color": "#8A4FC7"}, {"id": "j5", "name": "Operations", "color": "#6B7480"}], "alloc": {"p1|j1": {"2026-09-14": 40, "2026-09-21": 40, "2026-09-28": 40, "2026-10-05": 40, "2026-10-12": 40, "2026-10-19": 40, "2026-10-26": 40, "2026-11-02": 40, "2026-11-09": 40, "2026-11-16": 40}, "p1|j3": {"2026-09-28": 40, "2026-10-05": 60, "2026-10-12": 60, "2026-10-19": 60, "2026-10-26": 60, "2026-11-02": 40, "2026-11-09": 40, "2026-11-16": 40, "2026-11-23": 40, "2026-11-30": 40, "2026-12-07": 40, "2026-12-14": 40}, "p1|j5": {"2026-09-14": 20, "2026-09-21": 20, "2026-09-28": 20, "2026-10-05": 20, "2026-10-12": 20, "2026-10-19": 20, "2026-10-26": 20, "2026-11-02": 20, "2026-11-09": 20, "2026-11-16": 20, "2026-11-23": 20, "2026-11-30": 20, "2026-12-07": 20, "2026-12-14": 20, "2026-12-21": 20, "2026-12-28": 20, "2027-01-04": 20, "2027-01-11": 20, "2027-01-18": 20, "2027-01-25": 20}, "p2|j1": {"2026-09-14": 70, "2026-09-21": 70, "2026-09-28": 70, "2026-10-05": 70, "2026-10-12": 70, "2026-10-19": 70, "2026-10-26": 70, "2026-11-02": 70, "2026-11-09": 70, "2026-11-16": 70, "2026-11-23": 30, "2026-11-30": 30, "2026-12-07": 30, "2026-12-14": 30}, "p2|j4": {"2026-10-12": 30, "2026-10-19": 30, "2026-10-26": 30, "2026-11-02": 30, "2026-11-09": 30, "2026-11-16": 30, "2026-11-23": 30, "2026-11-30": 30}, "p3|j2": {"2026-09-14": 60, "2026-09-21": 60, "2026-09-28": 60, "2026-10-05": 60, "2026-10-12": 60, "2026-10-19": 60, "2026-10-26": 60, "2026-11-02": 60, "2026-11-09": 60, "2026-11-16": 60, "2026-11-23": 60, "2026-11-30": 60, "2026-12-07": 60, "2026-12-14": 60, "2026-12-21": 60, "2026-12-28": 60}, "p3|j1": {"2026-09-28": 30, "2026-10-05": 30, "2026-10-12": 30, "2026-10-19": 30}, "p3|j5": {"2026-09-14": 10, "2026-09-21": 10, "2026-09-28": 10, "2026-10-05": 10, "2026-10-12": 10, "2026-10-19": 10, "2026-10-26": 10, "2026-11-02": 10, "2026-11-09": 10, "2026-11-16": 10, "2026-11-23": 10, "2026-11-30": 10, "2026-12-07": 10, "2026-12-14": 10, "2026-12-21": 10, "2026-12-28": 10, "2027-01-04": 10, "2027-01-11": 10, "2027-01-18": 10, "2027-01-25": 10}, "p4|j1": {"2026-10-05": 50, "2026-10-12": 50, "2026-10-19": 50, "2026-10-26": 50, "2026-11-02": 50, "2026-11-09": 50, "2026-11-16": 50}, "p4|j4": {"2026-10-12": 40, "2026-10-19": 40, "2026-10-26": 40, "2026-11-02": 40, "2026-11-09": 40, "2026-11-16": 40, "2026-11-23": 40, "2026-11-30": 40}, "p4|j2": {"2026-10-19": 30, "2026-10-26": 30, "2026-11-02": 30, "2026-11-09": 30}, "p4|j5": {"2026-09-14": 10, "2026-09-21": 10, "2026-09-28": 10, "2026-10-05": 10, "2026-10-12": 10, "2026-10-19": 10, "2026-10-26": 10, "2026-11-02": 10, "2026-11-09": 10, "2026-11-16": 10, "2026-11-23": 10, "2026-11-30": 10, "2026-12-07": 10, "2026-12-14": 10, "2026-12-21": 10, "2026-12-28": 10, "2027-01-04": 10, "2027-01-11": 10, "2027-01-18": 10, "2027-01-25": 10}, "p5|j3": {"2026-09-28": 60, "2026-10-05": 60, "2026-10-12": 60, "2026-10-19": 60, "2026-10-26": 60, "2026-11-02": 60, "2026-11-09": 60, "2026-11-16": 60, "2026-11-23": 80, "2026-11-30": 80, "2026-12-07": 80, "2026-12-14": 60}, "p5|j5": {"2026-09-14": 10, "2026-09-21": 10, "2026-09-28": 10, "2026-10-05": 10, "2026-10-12": 10, "2026-10-19": 10, "2026-10-26": 10, "2026-11-02": 10, "2026-11-09": 10, "2026-11-16": 10, "2026-11-23": 10, "2026-11-30": 10, "2026-12-07": 10, "2026-12-14": 10, "2026-12-21": 10, "2026-12-28": 10, "2027-01-04": 10, "2027-01-11": 10, "2027-01-18": 10, "2027-01-25": 10}, "p6|j2": {"2026-09-14": 20, "2026-09-21": 20, "2026-09-28": 20, "2026-10-05": 20, "2026-10-12": 60, "2026-10-19": 60, "2026-10-26": 60, "2026-11-02": 60, "2026-11-09": 60, "2026-11-16": 60, "2026-11-23": 60, "2026-11-30": 60, "2026-12-07": 60, "2026-12-14": 60, "2026-12-21": 60, "2026-12-28": 60, "2027-01-04": 60, "2027-01-11": 60}, "p6|j5": {"2026-09-14": 20, "2026-09-21": 20, "2026-09-28": 20, "2026-10-05": 20, "2026-10-12": 20, "2026-10-19": 20, "2026-10-26": 20, "2026-11-02": 20, "2026-11-09": 20, "2026-11-16": 20, "2026-11-23": 20, "2026-11-30": 20, "2026-12-07": 20, "2026-12-14": 20, "2026-12-21": 20, "2026-12-28": 20, "2027-01-04": 20, "2027-01-11": 20, "2027-01-18": 20, "2027-01-25": 20}}, "sample": true}</script>
+<script id="app-script">
+(() => {
+"use strict";
+
+// ---------- Configuration ----------
+const WEEKS_VISIBLE = 12;
+const LOOKAHEAD_WEEKS = 4;
+const BULK_RANGE = { from: -4, count: 30 };
+const LIMITS = { text: 80, pct: 200, capMin: 5, capMax: 100, people: 200, projects: 100 };
+const PALETTE = ["#3B6FD8", "#2E9C8A", "#C2621B", "#8A4FC7", "#C23B6E", "#5C7A1F", "#3F8FB0", "#9A7B12"];
+const STORAGE_KEY = "biocapacity_v1";
+const BACKUP_KEY = "biocapacity_v1_unreadable";
+const THEME_KEY = "biocapacity_theme";
+const CONFIRM_MS = 4000;
+const ID_RE = /^[a-z][a-z0-9]{1,23}$/;
+const WEEK_RE = /^\d{4}-\d{2}-\d{2}$/;
+const COLOR_RE = /^#[0-9a-f]{6}$/i;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const HEAT_WORDS = ["Unallocated", "Under 70%", "Healthy", "Stretched", "Over capacity"];
+
+// ---------- Small helpers ----------
+const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ESC[c]);
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+const byId = (id) => document.getElementById(id);
+const val = (id) => byId(id)?.value ?? "";
+
+/** Collapse whitespace, strip control characters, cap length. */
+function cleanText(v, max = LIMITS.text) {
+  return String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+/** Parse a whole number; returns null for blank or non-numeric input. */
+function parseWhole(v) {
+  const s = String(v ?? "").trim();
+  if (s === "") return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? Math.round(n) : null;
+}
+
+function newId(prefix, taken) {
+  let id;
+  do {
+    const bytes = crypto.getRandomValues(new Uint8Array(4));
+    id = prefix + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  } while (taken.has(id));
+  return id;
+}
+
+const sameName = (a, b) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
+const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+const isId = (v) => typeof v === "string" && ID_RE.test(v);
+
+// ---------- Dates ----------
+function mondayOf(d) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+}
+function addWeeks(d, n) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() + 7 * n);
+  return x;
+}
+const isoDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const thisWeek = () => mondayOf(new Date());
+
+function weekList(startOffset, count) {
+  const base = thisWeek();
+  return Array.from({ length: count }, (_, i) => {
+    const d = addWeeks(base, startOffset + i);
+    return { key: isoDate(d), label: `${MONTHS[d.getMonth()]} ${d.getDate()}`, now: startOffset + i === 0 };
+  });
+}
+
+// ---------- State validation ----------
+/** Rebuild state from untrusted input, keeping only well-formed records. */
+function normalize(raw) {
+  const src = raw && typeof raw === "object" ? raw : {};
+  const out = { people: [], projects: [], alloc: {} };
+  if (src.sample === true) out.sample = true;
+
+  const peopleIds = new Set();
+  for (const p of Array.isArray(src.people) ? src.people : []) {
+    if (out.people.length >= LIMITS.people) break;
+    const name = cleanText(p?.name);
+    if (!isId(p?.id) || peopleIds.has(p.id) || !name) continue;
+    const cap = parseWhole(p.capacity);
+    peopleIds.add(p.id);
+    out.people.push({
+      id: p.id,
+      name,
+      role: cleanText(p.role),
+      capacity: cap === null ? 100 : clamp(cap, LIMITS.capMin, LIMITS.capMax),
+    });
+  }
+
+  const projectIds = new Set();
+  for (const j of Array.isArray(src.projects) ? src.projects : []) {
+    if (out.projects.length >= LIMITS.projects) break;
+    const name = cleanText(j?.name);
+    if (!isId(j?.id) || projectIds.has(j.id) || !name) continue;
+    projectIds.add(j.id);
+    out.projects.push({
+      id: j.id,
+      name,
+      color: COLOR_RE.test(j.color) ? j.color : PALETTE[out.projects.length % PALETTE.length],
+    });
+  }
+
+  const alloc = src.alloc && typeof src.alloc === "object" ? src.alloc : {};
+  for (const [key, weeks] of Object.entries(alloc)) {
+    const parts = key.split("|");
+    if (parts.length !== 2 || !peopleIds.has(parts[0]) || !projectIds.has(parts[1])) continue;
+    if (!weeks || typeof weeks !== "object") continue;
+    const clean = {};
+    for (const [wk, v] of Object.entries(weeks)) {
+      const n = parseWhole(v);
+      if (WEEK_RE.test(wk) && n !== null && n > 0) clean[wk] = Math.min(n, LIMITS.pct);
+    }
+    out.alloc[key] = clean;
+  }
+  return out;
+}
+
+// ---------- App state ----------
+// The sample plan ships inside the page and is used until this browser has its own copy.
+const SAMPLE = normalize(JSON.parse(byId("sample").textContent));
+let state = clone(SAMPLE);
+let storageOk = true;
+let loadNotice = null;
+let undoSnapshot = null;
+let weekOffset = 0;
+let overOnly = false;
+let pendingImport = null;
+const expanded = new Set();
+
+// ---------- Queries ----------
+const findPerson = (id) => state.people.find((p) => p.id === id);
+const findProject = (id) => state.projects.find((j) => j.id === id);
+const allocKey = (pid, jid) => `${pid}|${jid}`;
+
+function assignments(pid) {
+  return state.projects.filter((j) => Object.prototype.hasOwnProperty.call(state.alloc, allocKey(pid, j.id)));
+}
+function bookedPct(pid, wk) {
+  return state.projects.reduce((sum, j) => sum + (state.alloc[allocKey(pid, j.id)]?.[wk] || 0), 0);
+}
+function loadPct(pid, wk) {
+  const p = findPerson(pid);
+  return p ? Math.round((bookedPct(pid, wk) / p.capacity) * 100) : 0;
+}
+function teamLoadPct(wk) {
+  let booked = 0, cap = 0;
+  for (const p of state.people) { booked += bookedPct(p.id, wk); cap += p.capacity; }
+  return cap ? Math.round((booked / cap) * 100) : 0;
+}
+function heatLevel(v) {
+  if (v <= 0) return 0;
+  if (v < 70) return 1;
+  if (v <= 100) return 2;
+  if (v <= 120) return 3;
+  return 4;
+}
+
+// ---------- Mutations ----------
+function setAlloc(pid, jid, wk, pct) {
+  const k = allocKey(pid, jid);
+  if (!state.alloc[k]) state.alloc[k] = {};
+  if (pct > 0) state.alloc[k][wk] = pct;
+  else delete state.alloc[k][wk];
+}
+function removeAllocWhere(test) {
+  for (const k of Object.keys(state.alloc)) if (test(...k.split("|"))) delete state.alloc[k];
+}
+
+// ---------- Storage and undo ----------
+function loadPlan() {
+  let raw;
+  try { raw = localStorage.getItem(STORAGE_KEY); }
+  catch { storageOk = false; return clone(SAMPLE); }
+  if (raw === null) return clone(SAMPLE);
+  try {
+    return normalize(JSON.parse(raw));
+  } catch {
+    // Keep the unreadable copy instead of overwriting it, then start from the sample.
+    try { localStorage.setItem(BACKUP_KEY, raw); } catch { /* storage unavailable */ }
+    loadNotice = `Your saved plan couldn't be read, so the sample plan was loaded. The unreadable copy is kept in browser storage under "${BACKUP_KEY}".`;
+    return clone(SAMPLE);
+  }
+}
+
+function persist() {
+  if (!storageOk) return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    storageOk = false;
+    toast("This browser isn't saving changes (storage is full or blocked). Export a CSV to keep your work.");
+  }
+}
+
+/** Save the current plan and refresh the page. Any pending undo is dropped. */
+function commit({ rerender = true, keepUndo = false } = {}) {
+  if (!keepUndo) undoSnapshot = null;
+  persist();
+  if (rerender) render(); else renderSaveBar();
+}
+
+/** Run a larger change so a single Undo can reverse it. */
+function undoable(label, change) {
+  const before = clone(state);
+  if (change() === false) return;
+  undoSnapshot = { label, state: before };
+  commit({ keepUndo: true });
+}
+
+function undo() {
+  if (!undoSnapshot) return;
+  const { label, state: before } = undoSnapshot;
+  state = before;
+  expanded.clear();
+  commit();
+  toast(`Undid ${label}`);
+}
+
+// ---------- Feedback ----------
+let toastTimer;
+function toast(msg) {
+  const t = byId("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3600);
+}
+
+/** Destructive buttons need a second click within a few seconds. */
+function confirmed(btn) {
+  if (btn.dataset.armed === "1") return true;
+  const original = { text: btn.textContent, label: btn.getAttribute("aria-label") };
+  btn.dataset.armed = "1";
+  btn.classList.add("armed");
+  btn.textContent = btn.dataset.confirm || "Remove?";
+  btn.setAttribute("aria-label", `Confirm: ${original.label}`);
+  setTimeout(() => {
+    if (!btn.isConnected) return;
+    btn.dataset.armed = "";
+    btn.classList.remove("armed");
+    btn.textContent = original.text;
+    btn.setAttribute("aria-label", original.label);
+  }, CONFIRM_MS);
+  return false;
+}
+
+// ---------- Theme ----------
+const darkQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+
+function storedTheme() {
+  try {
+    const t = localStorage.getItem(THEME_KEY);
+    return t === "light" || t === "dark" ? t : null;
+  } catch { return null; }
+}
+const currentTheme = () => document.documentElement.dataset.theme || (darkQuery?.matches ? "dark" : "light");
+
+/** Explicit choice wins; without one the page follows the system setting. */
+function applyTheme(theme) {
+  if (theme) document.documentElement.dataset.theme = theme;
+  else delete document.documentElement.dataset.theme;
+  const btn = byId("theme-toggle");
+  if (btn) {
+    const { label, inner } = themeButtonParts();
+    btn.setAttribute("aria-label", label);
+    btn.innerHTML = inner;
+  }
+}
+
+function toggleTheme() {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  try { localStorage.setItem(THEME_KEY, next); } catch { /* storage unavailable */ }
+  applyTheme(next);
+}
+
+function themeButtonParts() {
+  const dark = currentTheme() === "dark";
+  const icon = dark
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="currentColor"/></svg>';
+  return { label: `Switch to ${dark ? "light" : "dark"} mode`, inner: `${icon}<span>${dark ? "Light mode" : "Dark mode"}</span>` };
+}
+
+function themeButtonHTML() {
+  const { label, inner } = themeButtonParts();
+  return `<button type="button" class="themetoggle" id="theme-toggle" data-act="theme" aria-label="${label}">${inner}</button>`;
+}
+
+// ---------- Rendering ----------
+function renderSaveBar() {
+  const el = byId("savebar");
+  if (!el) return;
+  const status = storageOk
+    ? '<span class="status">Changes save automatically in this browser</span>'
+    : '<span class="status warn">Changes aren\'t being saved in this browser. Export a CSV to keep your work.</span>';
+  const undoBtn = undoSnapshot ? `<button class="btn quiet" data-act="undo">Undo ${esc(undoSnapshot.label)}</button>` : "";
+  el.innerHTML = `${status}${undoBtn}<button class="btn" data-act="importcsv">Import CSV</button><button class="btn primary" data-act="csv">Export CSV</button>`;
+}
+
+function summaryHTML() {
+  const weeks = weekList(0, LOOKAHEAD_WEEKS);
+  const over = [];
+  const light = [];
+  for (const p of state.people) {
+    const loads = weeks.map((w) => loadPct(p.id, w.key));
+    const overWeeks = loads.filter((v) => v > 100).length;
+    if (overWeeks) over.push({ p, overWeeks, peak: Math.max(...loads) });
+    if (loads.reduce((a, b) => a + b, 0) / loads.length < 70) light.push(p);
+  }
+  over.sort((a, b) => b.peak - a.peak);
+
+  const first = over.length
+    ? `Over capacity in the next ${LOOKAHEAD_WEEKS} weeks: ${over
+        .map((o) => `<strong>${esc(o.p.name)}</strong> (${plural(o.overWeeks, "wk")}, peak ${o.peak}%)`)
+        .join(", ")}.`
+    : `Nobody is over capacity in the next ${LOOKAHEAD_WEEKS} weeks.`;
+  const roomFor = light.length ? ` Room for more work: ${light.map((p) => esc(p.name)).join(", ")}.` : "";
+  return `<p>${first}</p><p>Team load this week is ${teamLoadPct(isoDate(thisWeek()))}%.${roomFor}</p>`;
+}
+
+function heatCell(v, w, attr, title) {
+  const titleAttr = title ? ` title="${esc(title)}"` : "";
+  return `<td class="cell h${heatLevel(v)}${w.now ? " nowcol" : ""}" ${attr}${titleAttr}>${v > 0 ? `${v}%` : "–"}</td>`;
+}
+
+function personRows(p, weeks) {
+  const open = expanded.has(p.id);
+  const roleLine = esc(p.role) + (p.capacity !== 100 ? ` · ${p.capacity}% available` : "");
+  let h = `<tr class="prow${open ? " open" : ""}"><th class="namecol" scope="row">
+    <button class="person" data-act="toggle" data-p="${esc(p.id)}" aria-expanded="${open}">
+      <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1.5 7 5 3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span><span class="pname">${esc(p.name)}</span><span class="prole">${roleLine}</span></span>
+    </button></th>`;
+  for (const w of weeks) {
+    const v = loadPct(p.id, w.key);
+    h += heatCell(v, w, `data-total="${esc(p.id)}|${w.key}"`, `${p.name}, week of ${w.label}: ${v}% (${HEAT_WORDS[heatLevel(v)]})`);
+  }
+  h += "</tr>";
+  if (!open) return h;
+
+  const assigned = assignments(p.id);
+  for (const j of assigned) {
+    const weeksMap = state.alloc[allocKey(p.id, j.id)];
+    h += `<tr class="sub"><th class="namecol" scope="row"><div class="projlabel">
+      <span class="dot" style="background:${esc(j.color)}"></span>
+      <span class="txt" title="${esc(j.name)}">${esc(j.name)}</span>
+      <button class="x" data-act="unassign" data-p="${esc(p.id)}" data-j="${esc(j.id)}" aria-label="Remove ${esc(p.name)} from ${esc(j.name)}">×</button>
+    </div></th>`;
+    for (const w of weeks) {
+      h += `<td class="in"><input class="alloc" type="number" inputmode="numeric" min="0" max="${LIMITS.pct}" step="5" placeholder="–"
+        value="${weeksMap[w.key] || ""}" data-p="${esc(p.id)}" data-j="${esc(j.id)}" data-w="${w.key}"
+        aria-label="${esc(p.name)}, ${esc(j.name)}, week of ${w.label}, percent"></td>`;
+    }
+    h += "</tr>";
+  }
+
+  const available = state.projects.filter((j) => !assigned.includes(j));
+  const picker = available.length
+    ? `<div class="addproj"><select id="add-${esc(p.id)}" aria-label="Project to add for ${esc(p.name)}">
+        ${available.map((j) => `<option value="${esc(j.id)}">${esc(j.name)}</option>`).join("")}
+      </select><button class="btn" data-act="assign" data-p="${esc(p.id)}">Add</button></div>`
+    : `<span class="prole">${state.projects.length ? "On every project" : "Add projects in the panel below"}</span>`;
+  const hint = assigned.length ? "Enter the percent of their time each week. Totals update above." : "Add a project to start allocating time.";
+  h += `<tr class="sub addrow"><th class="namecol" scope="row">${picker}</th><td colspan="${weeks.length}" class="rowhint">${hint}</td></tr>`;
+  return h;
+}
+
+function gridHTML() {
+  if (!state.people.length) {
+    return '<div class="gridwrap"><p class="empty">No people yet. Add your team in the People panel below to start planning.</p></div>';
+  }
+  const weeks = weekList(weekOffset, WEEKS_VISIBLE);
+  const header = weeks
+    .map((w) => `<th scope="col" class="${w.now ? "now" : ""}">${w.label}${w.now ? '<span class="sr"> (this week)</span>' : ""}</th>`)
+    .join("");
+  const visible = state.people.filter((p) => !overOnly || weeks.some((w) => loadPct(p.id, w.key) > 100));
+  const body = visible.length
+    ? visible.map((p) => personRows(p, weeks)).join("")
+    : `<tr><td colspan="${weeks.length + 1}" class="empty">Nobody is over capacity in these weeks.</td></tr>`;
+  const team = weeks.map((w) => heatCell(teamLoadPct(w.key), w, `data-team="${w.key}"`)).join("");
+  return `<div class="gridwrap"><table class="grid">
+    <thead><tr><th class="namecol" scope="col">Person</th>${header}</tr></thead>
+    <tbody>${body}<tr class="team"><th class="namecol" scope="row">Whole team</th>${team}</tr></tbody>
+  </table></div>`;
+}
+
+function weekOptions(selected) {
+  return weekList(BULK_RANGE.from, BULK_RANGE.count)
+    .map((w) => `<option value="${w.key}"${w.key === selected ? " selected" : ""}>Week of ${w.label}${w.now ? " (this week)" : ""}</option>`)
+    .join("");
+}
+
+function panelsHTML() {
+  const options = (list) => list.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");
+  const start = isoDate(thisWeek());
+  const end = isoDate(addWeeks(thisWeek(), 7));
+
+  const bulk = state.people.length && state.projects.length
+    ? `<div class="form">
+        <label>Person<select id="b-person">${options(state.people)}</select></label>
+        <label>Project<select id="b-proj">${options(state.projects)}</select></label>
+        <label>From<select id="b-from">${weekOptions(start)}</select></label>
+        <label>Through<select id="b-to">${weekOptions(end)}</select></label>
+        <label>Percent of their time<input id="b-pct" type="number" min="0" max="${LIMITS.pct}" step="5" value="50" required data-enter="bulk"></label>
+        <div class="actions"><button class="btn primary" data-act="bulk">Apply to weeks</button></div>
+      </div>`
+    : '<p class="note">Add at least one person and one project first.</p>';
+
+  const people = state.people.map((p) => `<li>
+      <input type="text" value="${esc(p.name)}" maxlength="${LIMITS.text}" data-edit="pname" data-p="${esc(p.id)}" aria-label="Name">
+      <input type="text" class="role" value="${esc(p.role)}" maxlength="${LIMITS.text}" placeholder="Role" data-edit="prole" data-p="${esc(p.id)}" aria-label="Role for ${esc(p.name)}">
+      <input type="number" class="cap" min="${LIMITS.capMin}" max="${LIMITS.capMax}" step="5" value="${p.capacity}" data-edit="pcap" data-p="${esc(p.id)}" aria-label="Availability percent for ${esc(p.name)}">
+      <button class="x" data-act="delperson" data-p="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">×</button>
+    </li>`).join("");
+
+  const projects = state.projects.map((j) => `<li>
+      <input type="color" value="${esc(j.color)}" data-edit="jcolor" data-j="${esc(j.id)}" aria-label="Color for ${esc(j.name)}">
+      <input type="text" value="${esc(j.name)}" maxlength="${LIMITS.text}" data-edit="jname" data-j="${esc(j.id)}" aria-label="Project name">
+      <button class="x" data-act="delproj" data-j="${esc(j.id)}" aria-label="Remove ${esc(j.name)}">×</button>
+    </li>`).join("");
+
+  return `<div class="panels">
+    <section class="panel"><h2>Assign time in bulk</h2>
+      <p class="hint">Set the same percent across a range of weeks. It replaces what's there for that person and project. Use 0 to clear.</p>
+      ${bulk}
+    </section>
+    <section class="panel"><h2>People</h2>
+      <p class="hint">Availability is the share of a full week they can give to project work (${LIMITS.capMin}–${LIMITS.capMax}%).</p>
+      <ul class="list">${people}</ul>
+      <div class="addline">
+        <input type="text" id="new-person" maxlength="${LIMITS.text}" placeholder="Name" data-enter="addperson">
+        <input type="text" id="new-role" maxlength="${LIMITS.text}" placeholder="Role" data-enter="addperson">
+        <button class="btn" data-act="addperson">Add person</button>
+      </div>
+    </section>
+    <section class="panel"><h2>Projects</h2>
+      <p class="hint">Include a line for operations so routine work counts against capacity.</p>
+      <ul class="list">${projects}</ul>
+      <div class="addline">
+        <input type="text" id="new-proj" maxlength="${LIMITS.text}" placeholder="Project name" data-enter="addproj">
+        <button class="btn" data-act="addproj">Add project</button>
+      </div>
+    </section>
+  </div>`;
+}
+
+/** A selector that finds the same control after a re-render, or null. */
+function focusSelector(el) {
+  if (!el || el === document.body) return null;
+  const safe = (v) => /^[\w-]+$/.test(v);
+  if (el.id) return safe(el.id) ? `#${el.id}` : null;
+  const keys = ["act", "edit", "p", "j", "w"].filter((k) => el.dataset[k]);
+  if (!keys.length || !keys.every((k) => safe(el.dataset[k]))) return null;
+  return keys.map((k) => `[data-${k}="${el.dataset[k]}"]`).join("");
+}
+
+function render() {
+  const focusTarget = focusSelector(document.activeElement);
+  const sampleBanner = state.sample
+    ? '<div class="samplebanner"><span>This plan starts with sample data so you can see how it works.</span><button class="btn" data-act="clearsample" data-confirm="Clear everything?" aria-label="Clear sample data">Clear sample data</button></div>'
+    : "";
+  byId("root").innerHTML = `
+    <header class="apphead">
+      <div><div class="brand">Bio<span>Capacity</span></div><div class="tagline">Biotech Resource Capacity Tool</div></div>
+      <div class="headtools">
+        ${themeButtonHTML()}
+        <a class="tag" href="https://github.com/morganisms/biocapacity" target="_blank" rel="noopener noreferrer">morganisms: biocapacity</a>
+      </div>
+    </header>
+    <main class="wrap">
+    <h1>Team capacity</h1>
+    <p class="lead">Each cell is the share of a person's available time booked that week. Select a name to see and edit their projects.</p>
+    <div class="btns" id="savebar"></div>
+    <input type="file" id="csv-file" accept=".csv,text/csv" hidden>
+    ${importPanelHTML()}
+    ${sampleBanner}
+    <div class="summary" id="summary">${summaryHTML()}</div>
+    <div class="toolbar">
+      <div class="nav">
+        <button class="btn" data-act="prev" aria-label="Show earlier weeks">◀ Earlier</button>
+        <button class="btn" data-act="today"${weekOffset === 0 ? " disabled" : ""}>This week</button>
+        <button class="btn" data-act="next" aria-label="Show later weeks">Later ▶</button>
+        <label class="check"><input type="checkbox" id="over-only"${overOnly ? " checked" : ""}> Only people over capacity</label>
+      </div>
+      <div class="legend" role="group" aria-label="Color key">
+        <span><i style="background:var(--h1)"></i>Under 70%</span><span><i style="background:var(--h2)"></i>70–100%</span>
+        <span><i style="background:var(--h3)"></i>101–120%</span><span><i style="background:var(--h4)"></i>Over 120%</span>
+      </div>
+    </div>
+    <div id="grid">${gridHTML()}</div>
+    ${panelsHTML()}
+    </main>`;
+  renderSaveBar();
+  const el = focusTarget && document.querySelector(focusTarget);
+  if (el && !el.disabled) el.focus({ preventScroll: true });
+}
+
+/** Update heat cells and summary in place, so focus stays in the cell being edited. */
+function refreshTotals() {
+  for (const td of document.querySelectorAll("[data-total], [data-team]")) {
+    const team = td.dataset.team;
+    const [pid, wk] = team ? [null, team] : td.dataset.total.split("|");
+    const v = team ? teamLoadPct(wk) : loadPct(pid, wk);
+    td.className = `cell h${heatLevel(v)}${td.classList.contains("nowcol") ? " nowcol" : ""}`;
+    td.textContent = v > 0 ? `${v}%` : "–";
+  }
+  byId("summary").innerHTML = summaryHTML();
+}
+
+function refreshGridAndSummary() {
+  byId("grid").innerHTML = gridHTML();
+  byId("summary").innerHTML = summaryHTML();
+}
+
+// ---------- Actions ----------
+const viewActions = {
+  undo,
+  csv: exportCSV,
+  toggle(b) {
+    const id = b.dataset.p;
+    if (expanded.has(id)) expanded.delete(id);
+    else expanded.add(id);
+    render();
+  },
+  prev: () => { weekOffset -= 4; render(); },
+  next: () => { weekOffset += 4; render(); },
+  today: () => { weekOffset = 0; render(); },
+  theme: toggleTheme,
+};
+
+const editActions = {
+  unassign(b) {
+    if (!confirmed(b)) return;
+    undoable("removal", () => { delete state.alloc[allocKey(b.dataset.p, b.dataset.j)]; });
+  },
+  assign(b) {
+    const pid = b.dataset.p;
+    const jid = val(`add-${pid}`);
+    if (!findPerson(pid) || !findProject(jid)) return;
+    const k = allocKey(pid, jid);
+    if (!state.alloc[k]) state.alloc[k] = {};
+    commit();
+  },
+  bulk() {
+    const pid = val("b-person");
+    const jid = val("b-proj");
+    const pct = parseWhole(val("b-pct"));
+    if (!findPerson(pid) || !findProject(jid)) return;
+    if (pct === null || pct < 0 || pct > LIMITS.pct) {
+      toast(`Enter a percent from 0 to ${LIMITS.pct}.`);
+      byId("b-pct")?.focus();
+      return;
+    }
+    let from = val("b-from");
+    let to = val("b-to");
+    if (!WEEK_RE.test(from) || !WEEK_RE.test(to)) return;
+    if (from > to) [from, to] = [to, from];
+    const weeks = weekList(BULK_RANGE.from, BULK_RANGE.count).filter((w) => w.key >= from && w.key <= to);
+    expanded.add(pid);
+    undoable("bulk assign", () => { for (const w of weeks) setAlloc(pid, jid, w.key, pct); });
+    toast(pct === 0 ? `Cleared ${plural(weeks.length, "week")}` : `Set ${pct}% for ${plural(weeks.length, "week")}`);
+  },
+  addperson() {
+    addItem(state.people, { input: "new-person", noun: "person", nouns: "people", limit: LIMITS.people, prefix: "p" },
+      (name) => ({ name, role: cleanText(val("new-role")), capacity: 100 }));
+  },
+  delperson(b) {
+    if (!confirmed(b)) return;
+    const pid = b.dataset.p;
+    expanded.delete(pid);
+    undoable("removal", () => {
+      state.people = state.people.filter((p) => p.id !== pid);
+      removeAllocWhere((p) => p === pid);
+    });
+  },
+  addproj() {
+    addItem(state.projects, { input: "new-proj", noun: "project", nouns: "projects", limit: LIMITS.projects, prefix: "j" },
+      (name) => ({ name, color: PALETTE[state.projects.length % PALETTE.length] }));
+  },
+  delproj(b) {
+    if (!confirmed(b)) return;
+    const jid = b.dataset.j;
+    undoable("removal", () => {
+      state.projects = state.projects.filter((j) => j.id !== jid);
+      removeAllocWhere((_, j) => j === jid);
+    });
+  },
+  importcsv() { byId("csv-file")?.click(); },
+  cancelimport() { pendingImport = null; render(); },
+  applyimport: applyImport,
+  clearsample(b) {
+    if (!confirmed(b)) return;
+    expanded.clear();
+    undoable("clearing the sample", () => { state = { people: [], projects: [], alloc: {} }; });
+  },
+};
+
+/** Validate a new name, then append a record with a fresh id plus the fields from make(name). */
+function addItem(list, { input, noun, nouns, limit, prefix }, make) {
+  const name = cleanText(val(input));
+  if (!name) return toast(`Enter a name to add a ${noun}.`);
+  if (list.length >= limit) return toast(`A plan can hold up to ${limit} ${nouns}.`);
+  if (list.some((x) => sameName(x.name, name))) return toast(`There's already a ${noun} named ${name}.`);
+  list.push({ id: newId(prefix, new Set(list.map((x) => x.id))), ...make(name) });
+  commit();
+  byId(input)?.focus();
+}
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-act]");
+  if (!b || b.disabled) return;
+  const act = b.dataset.act;
+  if (viewActions[act]) return viewActions[act](b);
+  if (editActions[act]) editActions[act](b);
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  const t = e.target;
+  if (t.classList?.contains("alloc")) { t.blur(); return; }
+  const act = t.dataset?.enter;
+  if (act && editActions[act]) { e.preventDefault(); editActions[act](); }
+});
+
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.id === "over-only") { overOnly = t.checked; byId("grid").innerHTML = gridHTML(); return; }
+  if (t.id === "csv-file") { onImportFile(t); return; }
+  if (t.name === "impmode" && pendingImport) { pendingImport.mode = t.value === "replace" ? "replace" : "merge"; render(); return; }
+  if (t.classList.contains("alloc")) return onAllocChange(t);
+  if (t.dataset.edit) onFieldEdit(t);
+});
+
+function onAllocChange(input) {
+  const { p, j, w } = input.dataset;
+  if (!findPerson(p) || !findProject(j) || !WEEK_RE.test(w)) return;
+  const previous = state.alloc[allocKey(p, j)]?.[w] || 0;
+  const n = parseWhole(input.value);
+  // Browsers report unparseable number input as an empty value plus badInput.
+  if (input.validity?.badInput || (input.value.trim() !== "" && n === null)) {
+    input.value = previous || "";
+    toast(`Enter a number from 0 to ${LIMITS.pct}.`);
+    return;
+  }
+  const pct = clamp(n ?? 0, 0, LIMITS.pct);
+  if (n !== null && n !== pct) toast(`Percent must be between 0 and ${LIMITS.pct}, so it was set to ${pct}.`);
+  input.value = pct || "";
+  setAlloc(p, j, w, pct);
+  commit({ rerender: false });
+  refreshTotals();
+}
+
+/** Rename a person or project; reverts the field and explains if the name is blank or taken. */
+function rename(list, item, input, noun) {
+  const name = cleanText(input.value);
+  const problem = !name ? `A ${noun} needs a name.`
+    : list.some((o) => o !== item && sameName(o.name, name)) ? `There's already a ${noun} named ${name}.` : null;
+  if (problem) { input.value = item.name; toast(problem); return false; }
+  item.name = input.value = name;
+  return true;
+}
+
+function onFieldEdit(input) {
+  const person = findPerson(input.dataset.p);
+  const project = findProject(input.dataset.j);
+  let ok = false;
+  switch (input.dataset.edit) {
+    case "pname":
+      ok = !!person && rename(state.people, person, input, "person");
+      break;
+    case "prole":
+      if (person) { person.role = input.value = cleanText(input.value); ok = true; }
+      break;
+    case "pcap": {
+      if (!person) break;
+      const n = parseWhole(input.value);
+      ok = n !== null && n >= LIMITS.capMin && n <= LIMITS.capMax;
+      if (ok) person.capacity = n;
+      else { input.value = person.capacity; toast(`Availability must be between ${LIMITS.capMin} and ${LIMITS.capMax}%.`); }
+      break;
+    }
+    case "jname":
+      ok = !!project && rename(state.projects, project, input, "project");
+      break;
+    case "jcolor":
+      if (!project) break;
+      ok = COLOR_RE.test(input.value);
+      if (ok) project.color = input.value; else input.value = project.color;
+      break;
+  }
+  if (!ok) return;
+  commit({ rerender: false });
+  refreshGridAndSummary();
+}
+
+// ---------- Export ----------
+/** Quote for CSV and neutralize spreadsheet formulas in text cells. */
+function csvCell(v) {
+  let s = String(v);
+  if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function exportCSV() {
+  const rows = [["Person", "Role", "Availability %", "Project", "Week of", "Percent of time"]];
+  for (const p of state.people) {
+    for (const j of assignments(p.id)) {
+      const weeks = state.alloc[allocKey(p.id, j.id)];
+      for (const wk of Object.keys(weeks).sort()) rows.push([p.name, p.role, p.capacity, j.name, wk, weeks[wk]]);
+    }
+  }
+  const csv = rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+  // The byte-order mark tells Excel the file is UTF-8, so accented names survive.
+  const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }));
+  const link = Object.assign(document.createElement("a"), { href: url, download: `biocapacity-${isoDate(new Date())}.csv` });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ---------- Import ----------
+const IMPORT_LIMITS = { bytes: 2 * 1024 * 1024, rows: 20000, shownErrors: 8 };
+const COLUMN_ALIASES = {
+  person: ["person", "name", "personname", "resource", "teammember"],
+  role: ["role", "title", "jobtitle"],
+  capacity: ["availability", "capacity", "available"],
+  project: ["project", "projectname"],
+  week: ["weekof", "week", "weekstarting", "weekbeginning", "date"],
+  pct: ["percentoftime", "percent", "pct", "allocation", "allocationpercent", "load"],
+};
+const REQUIRED_COLUMNS = { person: "Person", project: "Project", week: "Week of", pct: "Percent of time" };
+
+/** RFC 4180 parser: quoted fields, doubled quotes, embedded newlines, CRLF. */
+function parseCSV(text) {
+  const firstLine = text.split(/\r?\n/, 1)[0];
+  const count = (ch) => firstLine.split(ch).length - 1;
+  const delim = count(",") ? "," : count(";") ? ";" : count("\t") ? "\t" : ",";
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') inQuotes = false;
+      else field += c;
+    } else if (c === '"' && field === "") {
+      inQuotes = true;
+    } else if (c === delim) {
+      row.push(field); field = "";
+    } else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); rows.push(row); row = []; field = "";
+      if (rows.length > IMPORT_LIMITS.rows + 1) break;
+    } else {
+      field += c;
+    }
+  }
+  if (field !== "" || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+/** Undo the formula guard added on export ('=Name → =Name), then clean. */
+function importText(v) {
+  const s = String(v ?? "").trim();
+  return cleanText(/^'[=+\-@]/.test(s) ? s.slice(1) : s);
+}
+
+/** Accepts 2026-10-05, 2026/10/5 or 10/5/2026, with an optional time. Returns a Date or null. */
+function parseImportDate(v) {
+  const s = String(v ?? "").trim().split(/[ T]/)[0];
+  let y, m, d, match;
+  if ((match = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/))) [, y, m, d] = match.map(Number);
+  else if ((match = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))) [, m, d, y] = match.map(Number);
+  else return null;
+  const date = new Date(y, m - 1, d);
+  const real = date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+  return real && y >= 2000 && y <= 2100 ? date : null;
+}
+
+function parsePercent(v, lo, hi) {
+  const s = String(v ?? "").trim().replace(/%$/, "").trim();
+  if (s === "") return { error: "is empty" };
+  const n = Number(s);
+  if (!Number.isFinite(n)) return { error: `"${s}" isn't a number` };
+  if (n > 0 && n < 1) return { error: `"${s}" looks like a fraction. Use whole percents, such as 50 instead of 0.5` };
+  const r = Math.round(n);
+  if (r < lo || r > hi) return { error: `${r} is outside ${lo}–${hi}` };
+  return { value: r };
+}
+
+function mapColumns(header) {
+  const norm = header.map((h) => importText(h).toLowerCase().replace(/[^a-z]/g, ""));
+  const cols = {};
+  for (const [key, aliases] of Object.entries(COLUMN_ALIASES)) {
+    const idx = norm.findIndex((h) => aliases.includes(h));
+    if (idx >= 0) cols[key] = idx;
+  }
+  return cols;
+}
+
+/** Turn file text into validated rows plus line-numbered errors. */
+function readImport(text, fileName) {
+  const result = { fileName, rows: [], errors: [], warnings: [], fatal: null };
+  const table = parseCSV(text.replace(/^\uFEFF/, ""));
+  const header = table[0] || [];
+  const cols = mapColumns(header);
+  const missing = Object.keys(REQUIRED_COLUMNS).filter((k) => cols[k] === undefined);
+  if (missing.length) {
+    result.fatal = `The file needs these columns: ${Object.values(REQUIRED_COLUMNS).join(", ")}. Missing: ${missing.map((k) => REQUIRED_COLUMNS[k]).join(", ")}.`;
+    return result;
+  }
+  if (table.length - 1 > IMPORT_LIMITS.rows) {
+    result.fatal = `The file has more than ${IMPORT_LIMITS.rows.toLocaleString()} rows. Split it into smaller files.`;
+    return result;
+  }
+
+  let snapped = 0;
+  const seen = new Map();
+  table.slice(1).forEach((cells, i) => {
+    const line = i + 2;
+    if (cells.every((c) => String(c).trim() === "")) return;
+    const cell = (key) => (cols[key] === undefined ? "" : cells[cols[key]] ?? "");
+    const fail = (msg) => result.errors.push(`Line ${line}: ${msg}.`);
+
+    const person = importText(cell("person"));
+    const project = importText(cell("project"));
+    if (!person) return fail("Person is empty");
+    if (!project) return fail("Project is empty");
+
+    const date = parseImportDate(cell("week"));
+    if (!date) return fail(`Week of "${cleanText(cell("week"), 30)}" isn't a date. Use YYYY-MM-DD or M/D/YYYY`);
+    const monday = mondayOf(date);
+    if (monday.getTime() !== date.getTime()) snapped++;
+
+    const pct = parsePercent(cell("pct"), 0, LIMITS.pct);
+    if (pct.error) return fail(`Percent of time ${pct.error}`);
+
+    let capacity = null;
+    const capRaw = String(cell("capacity")).trim();
+    if (capRaw !== "") {
+      const cap = parsePercent(capRaw, LIMITS.capMin, LIMITS.capMax);
+      if (cap.error) return fail(`Availability ${cap.error}`);
+      capacity = cap.value;
+    }
+
+    const row = { person, role: importText(cell("role")), capacity, project, week: isoDate(monday), pct: pct.value };
+    const key = [person, project, row.week].map((s) => s.toLocaleLowerCase()).join("|");
+    if (seen.has(key)) result.warnings.push(`Line ${line} repeats line ${seen.get(key)} for the same person, project and week. The later value is used.`);
+    seen.set(key, line);
+    result.rows.push(row);
+  });
+
+  if (snapped) result.warnings.unshift(`${snapped} date${snapped === 1 ? " wasn't a Monday and was" : "s weren't Mondays and were"} moved to the start of that week.`);
+  if (!result.rows.length && !result.errors.length) result.fatal = "The file has a header row but no data.";
+  else if (!result.rows.length) result.fatal = "None of the rows could be read.";
+  return result;
+}
+
+/** Apply rows to a copy of the plan. Nothing changes until the result is committed. */
+function simulateImport(rows, mode) {
+  const next = mode === "replace"
+    ? { people: [], projects: [], alloc: {} }
+    : clone(state);
+  const stats = { peopleAdded: 0, projectsAdded: 0 };
+  const setCells = new Set();
+  const clearedCells = new Set();
+  const personIds = new Set(next.people.map((p) => p.id));
+  const projectIds = new Set(next.projects.map((j) => j.id));
+
+  for (const r of rows) {
+    let p = next.people.find((x) => sameName(x.name, r.person));
+    if (!p) {
+      if (next.people.length >= LIMITS.people) return { error: `The import would go over the ${LIMITS.people}-person limit.` };
+      p = { id: newId("p", personIds), name: r.person, role: "", capacity: 100 };
+      personIds.add(p.id);
+      next.people.push(p);
+      stats.peopleAdded++;
+    }
+    if (r.role) p.role = r.role;
+    if (r.capacity !== null) p.capacity = r.capacity;
+
+    let j = next.projects.find((x) => sameName(x.name, r.project));
+    if (!j) {
+      if (next.projects.length >= LIMITS.projects) return { error: `The import would go over the ${LIMITS.projects}-project limit.` };
+      j = { id: newId("j", projectIds), name: r.project, color: PALETTE[next.projects.length % PALETTE.length] };
+      projectIds.add(j.id);
+      next.projects.push(j);
+      stats.projectsAdded++;
+    }
+
+    const k = allocKey(p.id, j.id);
+    if (!next.alloc[k]) next.alloc[k] = {};
+    const cell = `${k}|${r.week}`;
+    if (r.pct > 0) { next.alloc[k][r.week] = r.pct; setCells.add(cell); clearedCells.delete(cell); }
+    else { if (next.alloc[k][r.week]) clearedCells.add(cell); delete next.alloc[k][r.week]; setCells.delete(cell); }
+  }
+  delete next.sample;
+  return { next: normalize(next), stats: { ...stats, set: setCells.size, cleared: clearedCells.size } };
+}
+
+async function onImportFile(input) {
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file) return;
+  if (!/\.(csv|txt)$/i.test(file.name)) return toast("Choose a .csv file.");
+  if (file.size > IMPORT_LIMITS.bytes) return toast("That file is over 2 MB. Split it into smaller files.");
+  let text;
+  try { text = await file.text(); }
+  catch { return toast("That file couldn't be read."); }
+  if (/\u0000/.test(text)) return toast("That doesn't look like a CSV file. Save it from Excel as CSV, then try again.");
+  pendingImport = { ...readImport(text, cleanText(file.name)), mode: "merge" };
+  render();
+  byId("import-title")?.focus();
+}
+
+function importPanelHTML() {
+  if (!pendingImport) return "";
+  const imp = pendingImport;
+  const list = (items) => {
+    const shown = items.slice(0, IMPORT_LIMITS.shownErrors).map((m) => `<li>${esc(m)}</li>`).join("");
+    const more = items.length > IMPORT_LIMITS.shownErrors ? `<li>…and ${items.length - IMPORT_LIMITS.shownErrors} more.</li>` : "";
+    return shown + more;
+  };
+  let body;
+  if (imp.fatal) {
+    body = `<p class="imperror">${esc(imp.fatal)}</p>${imp.errors.length ? `<ul class="implist">${list(imp.errors)}</ul>` : ""}
+      <div class="actions"><button class="btn quiet" data-act="cancelimport">Cancel</button><button class="btn" data-act="importcsv">Choose another file</button></div>`;
+  } else {
+    const sim = simulateImport(imp.rows, imp.mode);
+    const people = new Set(imp.rows.map((r) => r.person.toLocaleLowerCase())).size;
+    const projects = new Set(imp.rows.map((r) => r.project.toLocaleLowerCase())).size;
+    const effect = sim.error
+      ? `<p class="imperror">${esc(sim.error)}</p>`
+      : `<p class="impstats">This will add ${plural(sim.stats.peopleAdded, "person", "people")} and ${plural(sim.stats.projectsAdded, "project")}, set ${plural(sim.stats.set, "week value")}${sim.stats.cleared ? ` and clear ${sim.stats.cleared}` : ""}.${imp.mode === "replace" ? " Everything not in the file will be removed." : ""}</p>`;
+    const replaceLabel = imp.mode === "replace" ? ' data-confirm="Replace the plan?"' : "";
+    body = `<p class="hint">Read ${plural(imp.rows.length, "row")} covering ${plural(people, "person", "people")} and ${plural(projects, "project")}. People and projects are matched by name.</p>
+      <fieldset class="modes"><legend class="sr">How to import</legend>
+        <label><input type="radio" name="impmode" value="merge"${imp.mode === "merge" ? " checked" : ""}>
+          <span><strong>Merge into the current plan</strong><span class="prole">Adds new people and projects and overwrites matching weeks. A 0 clears that week. Everything else stays.</span></span></label>
+        <label><input type="radio" name="impmode" value="replace"${imp.mode === "replace" ? " checked" : ""}>
+          <span><strong>Replace the whole plan</strong><span class="prole">The plan becomes exactly what's in the file.</span></span></label>
+      </fieldset>
+      ${effect}
+      ${imp.errors.length ? `<p class="imperror">${plural(imp.errors.length, "row")} can't be read and will be skipped:</p><ul class="implist">${list(imp.errors)}</ul>` : ""}
+      ${imp.warnings.length ? `<ul class="implist warn">${list(imp.warnings)}</ul>` : ""}
+      <div class="actions"><button class="btn quiet" data-act="cancelimport">Cancel</button>
+        <button class="btn primary" data-act="applyimport"${sim.error ? " disabled" : ""}${replaceLabel} aria-label="Import ${plural(imp.rows.length, "row")}">Import ${plural(imp.rows.length, "row")}</button></div>`;
+  }
+  return `<section class="panel importpanel" aria-labelledby="import-title">
+    <h2 id="import-title" tabindex="-1">Import ${esc(imp.fileName)}</h2>${body}</section>`;
+}
+
+function applyImport(b) {
+  if (!pendingImport || pendingImport.fatal) return;
+  if (pendingImport.mode === "replace" && !confirmed(b)) return;
+  const sim = simulateImport(pendingImport.rows, pendingImport.mode);
+  if (sim.error) return toast(sim.error);
+  expanded.clear();
+  pendingImport = null;
+  undoable("import", () => { state = sim.next; });
+  toast("Imported. Use Undo above to reverse it.");
+}
+
+// ---------- Start ----------
+applyTheme(storedTheme());
+darkQuery?.addEventListener?.("change", () => { if (!storedTheme()) applyTheme(null); });
+state = loadPlan();
+render();
+if (!storageOk) toast("This browser isn't saving changes. Export a CSV to keep your work.");
+else if (loadNotice) toast(loadNotice);
+
+// Keep several open tabs in step with each other.
+window.addEventListener("storage", (e) => {
+  if (e.key !== STORAGE_KEY || e.newValue === null) return;
+  try {
+    state = normalize(JSON.parse(e.newValue));
+    undoSnapshot = null;
+    pendingImport = null;
+    render();
+    toast("Updated with changes made in another tab");
+  } catch { /* ignore unreadable updates */ }
+});
+})();
+</script>
+</body>
+</html>
